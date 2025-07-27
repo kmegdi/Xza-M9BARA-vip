@@ -6,31 +6,27 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 app.logger.setLevel(logging.INFO)
 
-def get_author_info():
-    return "🔥 API BY XZANJA 🔥"
-
 RAW_TOKENS = [
-    ("3831627617", "CAC2F2F3E2F28C5F5944D502CD171A8AAF84361CDC483E94955D6981F1CFF3E3"),
-    ("3994866749", "E47897A0E01A6A1F7DFFEE99C4BFC8C727C89F4D2E1AD69DC618DB017"),
-    ("3994925650", "2FFAD363ABF1E80E9004090C7263D1EB89B6751A21B2C1DAEA2155788")
+    ("4067715006", "C6B714258ACBB566DF8609843FB2CC523412D80F4B95E3DAA1A9B983E34244E7"),
+    # أضف المزيد إن أردت
 ]
 
 JWT_TOKENS = {}
 
-def fetch_jwt(uid, raw_token):
+def get_author_info():
+    return "🔥 API BY XZANJA 🔥"
+
+def fetch_jwt(uid, password):
     try:
-        url = f"https://ff-token-generator.vercel.app/token?uid={uid}&password={raw_token}"
-        res = requests.get(url)
-        if res.status_code == 200:
-            data = res.json()
-            token = data.get("token", "")
-            if token.count(".") == 2:
-                app.logger.info(f"✅ JWT محدث لـ UID {uid}")
-                return token
-        app.logger.warning(f"❌ فشل في جلب JWT لـ UID {uid}: {res.text}")
+        response = requests.get(f"https://jwt-gen-api-v2.onrender.com/token?uid={uid}&password={password}")
+        if response.status_code == 200:
+            return response.json().get("jwt")
+        else:
+            app.logger.error(f"❌ فشل في جلب JWT لـ UID {uid}")
+            return None
     except Exception as e:
-        app.logger.error(f"🚫 خطأ في جلب JWT: {e}")
-    return None
+        app.logger.error(f"❌ خطأ أثناء جلب JWT: {e}")
+        return None
 
 def update_all_jwt_tokens():
     while True:
